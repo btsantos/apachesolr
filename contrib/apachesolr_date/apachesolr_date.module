@@ -18,7 +18,7 @@ function apachesolr_date_apachesolr_facets() {
   $facets = array();
   if ($fields) {
     foreach ($fields as $name => $field) {
-      if (in_array($field['field_type'], array('date', 'datetime', 'datestamp'))) {
+      if (!empty($field['field_type']) && in_array($field['field_type'], array('date', 'datetime', 'datestamp'))) {
         $cck_info = content_fields($field['field_name']);
         // Only fields with a value2 have end dates to facet upon.
         if (isset($cck_info['columns']['value2'])) {

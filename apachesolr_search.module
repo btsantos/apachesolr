@@ -752,11 +752,15 @@ function apachesolr_search_apachesolr_facets() {
       if (!empty($field['facets'])) {
         // $delta can only be 32 chars, and the CCK field name may be this
         // long also, so we cannot add anything to it.
-        $placeholders = array('@field_type' => $field['field_type'], '@field' => $field['widget']['label'], '@field_name' => $field['field_name']);
+        $placeholders = array(
+          '@field_type' => isset($field['field_type']) ? $field['field_type'] : '',
+          '@field' => isset($field['widget']['label']) ? $field['widget']['label'] : '',
+          '@field_name' => isset($field['field_name']) ? $field['field_name'] : '',
+        );
         $facets[$field['field_name']] = array_merge($field, array(
           'info' => t('CCK @field_type field: Filter by @field (@field_name)', $placeholders),
           'facet_field' => apachesolr_index_key($field),
-          'content_types' => $field['content_types'],
+          'content_types' => isset($field['content_types']) ?  $field['content_types'] : '',
         ));
       }
     }
