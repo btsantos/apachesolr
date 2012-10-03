@@ -2400,7 +2400,7 @@ interface Drupal_Solr_Query_Interface {
    * @param string $value
    *   The facet value to check against
    */
-  function has_filter($field, $value);
+  function has_filter($field, $value = NULL);
 
   /**
    * Add a filter to a query.
