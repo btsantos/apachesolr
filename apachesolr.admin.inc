@@ -386,6 +386,10 @@ function apachesolr_index_action_form() {
       'title' => t('Delete the index'),
       'description' => t('All documents in the Solr index will be deleted. This is rarely necessary unless your index is corrupt or you have installed a new schema.xml. After doing this your content will need to be resubmitted for indexing.'),
     ),
+    'repair' => array(
+      'title' => t('Repair index queue'),
+      'description' => t('Recover content that is missing from the queue and the index.'),
+    ),
   );
   foreach ($actions as $key => $action) {
     // Generate the parents as the autogenerator does, so we will have a
@@ -421,6 +425,10 @@ function apachesolr_index_action_form_submit($form, &$form_state) {
       apachesolr_batch_index_remaining();
       break;
 
+    case 'repair':
+      apachesolr_repair_index();
+      break;
+
     case 'reindex':
       $form_state['redirect'] = 'admin/settings/apachesolr/index/confirm/clear';
       break;
@@ -429,6 +437,19 @@ function apachesolr_index_action_form_submit($form, &$form_state) {
       $form_state['redirect'] = 'admin/settings/apachesolr/index/confirm/delete';
       break;
   }
+}
+
+function apachesolr_repair_index() {
+  db_query("INSERT INTO {apachesolr_search_node} (nid, status, changed)
+            SELECT n.nid, n.status, %d as changed
+            FROM {node} n
+            LEFT OUTER JOIN {apachesolr_search_node} s ON n.nid = s.nid
+            WHERE s.nid is NULL",
+            time()
+            );
+  $affected_rows = db_affected_rows();
+  drupal_set_message(t('Apache solr node queue repaired, %number nodes added to the queue',
+    array('%number' => $affected_rows)), $type = 'status');
 }
 
 /**
